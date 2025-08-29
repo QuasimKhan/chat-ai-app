@@ -1,6 +1,6 @@
 import { StreamChat } from "stream-chat";
 import { apiKey, serverClient } from "../serverClient";
-import { OpenAIAgent } from "./openai/OpenAIAgent";
+import { GeminiAgent } from "./openai/GeminiAgent"; // ✅ replaced OpenAIAgent → GeminiAgent
 import { AgentPlatform, AIAgent } from "./types";
 
 export const createAgent = async (
@@ -10,6 +10,7 @@ export const createAgent = async (
   channel_id: string
 ): Promise<AIAgent> => {
   const token = serverClient.createToken(user_id);
+
   // This is the client for the AI bot user
   const chatClient = new StreamChat(apiKey, undefined, {
     allowServerSideConnect: true,
@@ -21,8 +22,8 @@ export const createAgent = async (
 
   switch (platform) {
     case AgentPlatform.WRITING_ASSISTANT:
-    case AgentPlatform.OPENAI:
-      return new OpenAIAgent(chatClient, channel);
+    case AgentPlatform.GEMINI: // ✅ changed from OPENAI → GEMINI
+      return new GeminiAgent(chatClient, channel);
     default:
       throw new Error(`Unsupported agent platform: ${platform}`);
   }

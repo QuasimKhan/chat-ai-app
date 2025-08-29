@@ -65,16 +65,16 @@ app.post("/start-ai-agent", async (req, res) => {
       const channel = serverClient.channel(channel_type, channel_id);
       await channel.addMembers([user_id]);
 
+      // ✅ Use GEMINI instead of OPENAI
       const agent = await createAgent(
         user_id,
-        AgentPlatform.OPENAI,
+        AgentPlatform.GEMINI,
         channel_type,
         channel_id
       );
 
       await agent.init();
-      // Final check to prevent race conditions where an agent might have been added
-      // while this one was initializing.
+
       if (aiAgentCache.has(user_id)) {
         await agent.dispose();
       } else {
@@ -155,7 +155,6 @@ app.post("/token", async (req, res) => {
       });
     }
 
-    // Create token with expiration (1 hour) and issued at time for security
     const issuedAt = Math.floor(Date.now() / 1000);
     const expiration = issuedAt + 60 * 60; // 1 hour from now
 
@@ -180,7 +179,6 @@ async function disposeAiAgent(aiAgent: AIAgent) {
   });
 }
 
-// Start the Express server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
